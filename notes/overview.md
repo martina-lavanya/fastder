@@ -363,6 +363,9 @@ bigwig can have per nucleotide resolution
 
 Notes 12.9: look at bigwig file in 1 bp resolution -> how? start thinking about algorithm and how to integrate the sj junction files.
 
+# Names
+fastder
+dEXpress, DExpress, D-Express
 # Questions about derfinder paper:
 1. how does the ER approach differ? I think they use the sum of coverage across each region and calculate differential expression based on that
 2. is the average-coverage cutoff applied base-wise (each base in an ER must have an average coverage of 5 reads) or per region (ER must have an average coverage of 5 reads across the whole region, more robust)
