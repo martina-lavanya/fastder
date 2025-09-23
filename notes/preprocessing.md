@@ -35,6 +35,8 @@ set to SSH
 1. git remote set-url origin git@github.com:vatkruidvat/fastder.git
 2. ssh -T git@github.com
 
+diverging branches:
+git pull --rebase origin initial-cpp-algorithm
 
 
 
