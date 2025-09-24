@@ -27,7 +27,7 @@
    -1: too few reads
    1...n: part of differentially expressed region x
    4. create vector which stores only the differentially expressed regions and their positions and th
-   region------start--------end---------coverage (avg)---------coverage (actual)----------difference
+   chrom------start--------end---------coverage (avg)---------coverage (actual)----------difference
 
    
 
