@@ -432,14 +432,14 @@ it will be hard to consider chr-level expression differences
 
 # 17.9.25 TODOs for next time
 
-1. check metadata of brain samples and choose a few with similar groups (age, sex, brain region)
+1. check metadata of brain samples and choose a few with similar groups (age, sex, brain region) --DONE
 
-2. check for library size and normalize (perhaps do this in python?), select chr19
+2. check for library size and normalize (perhaps do this in python?), select chr19 --DONE
 
-3. choose some samples and compute their average expression
+3. choose some samples and compute their average expression --DONE
 
 4. then implement a sliding window that iterates over chromosome 19 and tries to find differentially expressed regions
-	use a cutoff of 5 reads for now
+	use a cutoff of 5 reads for now --CURRENTLY WORKING ON THIS
 
 
 5. compare to visualization or genome uscs browser to validate results? or directly map them to annotations?

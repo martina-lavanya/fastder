@@ -65,3 +65,7 @@ get username:
 reset interrupted git add: 
 	git reset
 
+# TODO from 24.9
+working on cpp implementation, somehow the code doesn't run anymore but definitely did run a few commits ago. think about implementing
+only the threshold cutoff vs also the tolerance (assuming that an expressed region has similar coverage across the bases of the region).
+find_DERs definitely has bugs. 
