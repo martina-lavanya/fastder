@@ -29,7 +29,39 @@
    4. create vector which stores only the differentially expressed regions and their positions and th
    chrom------start--------end---------coverage (avg)---------coverage (actual)----------difference
 
-   
+idea: have data structure with string (chr) and vector (bp coverage) for when i work with multiple chromosomes as well
+
+# using the splice junction files
+- contain info about start, end, length of a splice junction 
+  - so is a splice junction also informing about the length of the intron? 
+  --> start = first base of the intron, end = last base of the intron
+
+**Integration plan**
+- I know for which samples a splice junction (with its exact coordinates) has nonzero coverage (= reads mapping to it) - what do i do with this info?
+    - either i could remove all DERs that map to a splice junction or a region between a splice junction
+    - or perhaps the aim is to find expressed introns?
+    - or to annotate intronic and exonic regions? what about intergenic regions (not even in pre-mRNA)? UTRs?
+  can we assume that an intron is surrounded by exons, so the regions before and after the intron are likely exons? 
+    - to verify that a DER is actually in an exonic region -> stronger support for the DER?
+
+# sample files
+
+# RR file
+chromosome	start	end	length	strand	annotated	left_motif	right_motif	left_annotated	right_annotated
+ERCC-00002	73	127	55	+	0	GT	AG	0	0
+ERCC-00002	111	753	643	+	0	GT	AG	0	0
+ERCC-00002	196	228	33	+	0	GT	AG	0	0
+ERCC-00002	259	491	233	-	0	CT	AC	0	0
+ERCC-00002	332	430	99	+	0	GT	AG	0	0
+ERCC-00002	408	430	23	+	0	GT	AG	0	0
+ERCC-00002	494	576	83	-	0	CT	AC	0	0
+ERCC-00002	554	588	35	+	0	GT	AG	0	0
+
+# MM file
+row col value, where row 
+
+# further ideas for algorithm
+- smoothening: https://pmc.ncbi.nlm.nih.gov/articles/PMC3304533/
 
 # C++ Dataframe Libraries
 https://github.com/hosseinmoein/DataFrame
@@ -65,9 +97,4 @@ get username:
 reset interrupted git add: 
 	git reset
 
-# TODO from 24.9
-working on cpp implementation, somehow the code doesn't run anymore but definitely did run a few commits ago. think about implementing
-only the threshold cutoff vs also the tolerance (assuming that an expressed region has similar coverage across the bases of the region).
-find_DERs definitely has bugs. 
 
-idea: have data structure with string (chr) and vector (bp coverage) for when i work with multiple chromosomes as well 

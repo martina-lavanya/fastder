@@ -250,7 +250,7 @@ another evaluation method:
 
 harvard collected all sra data from mouse and human and align everything to give coverage 
 	- show that some splice sites are not annotated even though they have been sequenced enough(cumulative nr of junctions)
-	- Fig 3: some junctions are less explored in certan cell types
+	- Fig 3: some junctions are less explored in certain cell types
 	- if some junction is diff. expr. in a specific cell type it is likely not annotated
 
 
@@ -439,11 +439,13 @@ it will be hard to consider chr-level expression differences
 3. choose some samples and compute their average expression --DONE
 
 4. then implement a sliding window that iterates over chromosome 19 and tries to find differentially expressed regions
-	use a cutoff of 5 reads for now --CURRENTLY WORKING ON THIS
-
+	use a cutoff of 5 reads for now --DONE, but cutoff 0.25 for normalization to CPM
+-- should I be less granular / strict about cutoffs of regions? 
+one region with a few peaks: https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr19%3A54400313%2D54500000&hgsid=3189067870_aBKmasJmW9zYvCLAlBa75LhRFgW8
 
 5. compare to visualization or genome uscs browser to validate results? or directly map them to annotations?
 
 6. how do i use splice junction files?
+7. how do i consider strand info?
 
 remember to clone git repo and to download the files via wget onto the server directly if possible 

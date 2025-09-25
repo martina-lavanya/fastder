@@ -86,9 +86,6 @@ Ideas:
 	note that depending on the site, the cutoff can be more or less clean cut
 		not-so-clean: https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr1%3A160037400%2D160037600&hgsid=3165714530_UK0JAgDpH119ju1HV7IOFvAtcbIn
 		super-clean: https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr1%3A160042400%2D160043000&hgsid=3165714530_UK0JAgDpH119ju1HV7IOFvAtcbIn
-2. 
-
-
 
 megadepth: computing coverage for genomic regions from the recount3 bigWig
 files 
