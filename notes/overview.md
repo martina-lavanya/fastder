@@ -449,3 +449,8 @@ one region with a few peaks: https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&la
 7. how do i consider strand info?
 
 remember to clone git repo and to download the files via wget onto the server directly if possible 
+
+# meeting Izaskun 1.10.25
+1. how do I deal with group effects? am I meant to calculate the average normalized counts across two groups and then apply the threshold for differential expression? Or should I consider 
+	group separately?
+2. 
