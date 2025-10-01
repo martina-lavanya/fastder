@@ -450,14 +450,14 @@ one region with a few peaks: https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&la
 
 remember to clone git repo and to download the files via wget onto the server directly if possible 
 
-# meeting Izaskun 1.10.25
+# MEETING NOTES Izaskun 01.10.25
 1. how do I deal with group effects? am I meant to calculate the average normalized counts across two groups and then apply the threshold for differential expression? Or should I consider 
 	group separately?
 
 	-> my thought: in a first step, i'm just finding expressed regions, not DIFFERENTIALLY expressed -> no need to do DE analysis, but should i still consider group effects or be more specific (this region is expressed for male patients with age 40-49, but not for male patients aged 50-59)
 
 
-	expectation that the groups of samples have to be meaningful
+	expectation that the groups of samples have to be meaningful, is the user's responsibility
 
 2. coordinates in splice junction files: start = first base of the intron, end = last base of the intron?
 
@@ -474,7 +474,6 @@ no not really, but maybe use memory (either an average coverage across past 10 e
 	in derfinder, INTRAGENIC = genomic region that is outside of any previously annotated gene
 
 5. is my final output supposed to be the list of ERs and their annotations (intronic, exonic, intragenic) or should i be doing DE analysis as well?
-
 
 -> telling exons from introns is difficult
 

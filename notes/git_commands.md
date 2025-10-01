@@ -4,7 +4,7 @@
 2. ssh martina@130.60.193.174 (easier password)
 
 
-# Git notes
+# Git Command Overview
 - add directories I want to ignore to the .gitignore in root (mls_semesterprojekt)
 
 process to set up repo: 
@@ -21,6 +21,12 @@ set to SSH
 
 diverging branches:
 git pull --rebase origin initial-cpp-algorithm
+
+remove folder from remote
+1. add to .gitignore
+2. git rm -r --cached <folder> (don't forget --cached, otherwise local deletion as well!)
+3. git commit -m
+4. git push
 
 
 make new branch
