@@ -453,4 +453,81 @@ remember to clone git repo and to download the files via wget onto the server di
 # meeting Izaskun 1.10.25
 1. how do I deal with group effects? am I meant to calculate the average normalized counts across two groups and then apply the threshold for differential expression? Or should I consider 
 	group separately?
-2. 
+
+	-> my thought: in a first step, i'm just finding expressed regions, not DIFFERENTIALLY expressed -> no need to do DE analysis, but should i still consider group effects or be more specific (this region is expressed for male patients with age 40-49, but not for male patients aged 50-59)
+
+
+	expectation that the groups of samples have to be meaningful
+
+2. coordinates in splice junction files: start = first base of the intron, end = last base of the intron?
+
+	- check this!! can have offset of 2 as well
+
+
+3. should i smoothen the coverage signal at all?
+
+no not really, but maybe use memory (either an average coverage across past 10 exons if the sj are present, or weight the nearest exon more strongly. note that the next exon is not present, maybe revisit gene once all exons were found)
+	- also, includes different transcripts! but if coverage is similar, i can assume they are part of a gene
+
+
+4. How is an intragenic region defined?
+	in derfinder, INTRAGENIC = genomic region that is outside of any previously annotated gene
+
+5. is my final output supposed to be the list of ERs and their annotations (intronic, exonic, intragenic) or should i be doing DE analysis as well?
+
+
+-> telling exons from introns is difficult
+
+I don't know if two closeby regions are part of the same transcript or not, this is what i need the sj files for
+
+6. should i also use Ensembl database v75 to map my annotations?
+
+maybe do in the end, but first stitch together exons
+
+## important: coverage is strandless but junctions are strand-specific!!
+
+# visualisation
+
+bedtools -> check if coverage is higher in my ERs
+
+
+
+similarity metrics to check if regions are similar or not
+
+need to store in gff
+	- rows are not independent
+
+
+
+	trust score for nr of annotations is a good idea, but novel ones are the most interesting
+
+	-> add flag that allows user to decide how adventurous (only stitch together exons with sj present, or also if the coverage matches even if sj not in sj files)
+
+
+i have to use gtf / gff for output --> normally use basic gene annotation!
+	- kind of like a bed file
+	- rows are not independent, gene_id and gene_type are present and has tags
+	rows can be of the same gene
+
+	col 3 gene exon or transcript or start_codon, stop_codon
+
+	can i even say if it's a transcript or a gene, in the end say it's a gene (stitched together exons)
+
+	input is open-reading frame, or expressed sequence tags
+
+
+	GFF3 has less quotes and spaces, but same logic
+
+
+	GTF can be compared against GENCODE with gffcompare
+
+
+
+generate one gff per sample or multiple? define which samples belong together if i output one gff for multiple
+
+
+adaptative baselines
+
+
+how to count library size with multiple chromosomes?? make normalization a user input
+
