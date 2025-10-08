@@ -12,3 +12,14 @@ when the position of the current sj has been passed
 as one gene. 
 
 later: also consider closeby ERs that have similar coverage even if sj is not included
+
+
+# TODO from 08.10
+1. consider making std::vector<std::vector<double>> all_per_base_coverages; an unordered_map
+instead, where the keys are the chromosomes and each chromosome has a vector of per-base coverages
+
+std::vector<std::unordered_map<std::string, std::vector<double>> all_per_base_coverages;
+
+2. implement chromosome sanity checks whenever calling compute_per_base_coverage on a bin of BedGraph
+3. probably combine parser and averager to Preprocessor? currently i am storing all bedgraphs and all per base coverage twice!!
+is it perhaps more efficient anyway? normalize is per-sample, so should be called in parser loop
