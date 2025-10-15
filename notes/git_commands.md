@@ -41,3 +41,8 @@ reset interrupted git add:
 	git reset
 
 
+grep:
+
+1. for a file name: find . -type f -name "filename.txt" (or find /etc/hosts -type f -name "hi.txt")
+2. for a directory: find . -type d -name "dirname"
+3. for a string: grep -ri "search"

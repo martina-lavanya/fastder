@@ -1,9 +1,9 @@
 ## Notes about the GTEx brain junctions RR file
 --> this is across all samples!
-chromosome	start	end		length	strand	annotated	left_motif	right_motif	left_annotated												right_annotated
-chr1			12698	13203		506		+			0					GT				AG			aC19,gC19,gC24,gC25,gC26,gC29,gC33,kG19,kG38,sG19,sG38	0
-chr1			12698	13220		523		+			1					GT				AG			aC19,gC19,gC24,gC25,gC26,gC29,gC33,kG19,kG38,sG19,sG38 aC19,cH38,gC19,gC24,gC25,gC26,gC29,gC33,kG19,kG38,rG19,rG38,sG19,sG38
-chr1			12698	13224		527		+			0					GT				AG			aC19,gC19,gC24,gC25,gC26,gC29,gC33,kG19,kG38,sG19,sG38	gC19
+chromosome	start	end		length	strand	annotated	left_motif	right_motif	left_annotated																					right_annotated
+chr1			12698	13203		506			+				0					GT					AG					aC19,gC19,gC24,gC25,gC26,gC29,gC33,kG19,kG38,sG19,sG38	0
+chr1			12698	13220		523			+				1					GT					AG					aC19,gC19,gC24,gC25,gC26,gC29,gC33,kG19,kG38,sG19,sG38 	aC19,cH38,gC19
+chr1			12698	13224		527			+				0					GT					AG					aC19,gC19,gC24,gC25,gC26,gC29,gC33,kG19,kG38,sG19,sG38	gC19
 
 
 describes the chromosome, bp position, annotation

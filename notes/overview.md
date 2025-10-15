@@ -457,11 +457,11 @@ remember to clone git repo and to download the files via wget onto the server di
 	-> my thought: in a first step, i'm just finding expressed regions, not DIFFERENTIALLY expressed -> no need to do DE analysis, but should i still consider group effects or be more specific (this region is expressed for male patients with age 40-49, but not for male patients aged 50-59)
 
 
-	expectation that the groups of samples have to be meaningful, is the user's responsibility
+	answer: expectation that the groups of samples have to be meaningful, is the user's responsibility
 
 2. coordinates in splice junction files: start = first base of the intron, end = last base of the intron?
 
-	- check this!! can have offset of 2 as well
+	- TODO check this!! can have offset of 2 as well
 
 
 3. should i smoothen the coverage signal at all?
@@ -530,3 +530,8 @@ adaptative baselines
 
 how to count library size with multiple chromosomes?? make normalization a user input
 
+# Questions 15.10 onwards
+
+1. would I stitch together two exons if the splice junction exists but was not present in any of the samples?
+
+2. 

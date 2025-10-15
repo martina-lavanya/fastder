@@ -18,8 +18,52 @@ later: also consider closeby ERs that have similar coverage even if sj is not in
 1. consider making std::vector<std::vector<double>> all_per_base_coverages; an unordered_map
 instead, where the keys are the chromosomes and each chromosome has a vector of per-base coverages
 
-std::vector<std::unordered_map<std::string, std::vector<double>> all_per_base_coverages;
+std::vector<std::unordered_map<std::string, std::vector<double>>> all_per_base_coverages;
 
 2. implement chromosome sanity checks whenever calling compute_per_base_coverage on a bin of BedGraph
 3. probably combine parser and averager to Preprocessor? currently i am storing all bedgraphs and all per base coverage twice!!
 is it perhaps more efficient anyway? normalize is per-sample, so should be called in parser loop
+
+
+read_mm takes about 2-3 min to run!
+
+
+# Algorithm
+1. parse files: 
+	MM file has splice junctions + occurrence count for each sample
+	RR file uses the sj_id as an index and is a vector of SJRows
+	Bedgraph file as a vector of BedGraphRows for each sample -> matrix of BedGraphRow vectors
+
+	-> what to do about chromosome info? only problematic for per sample coverage, bedgraphrows have the chromosome info integrated
+
+2. iterate over each sample's Bedgraphrow before moving on to the next sample and compute 
+	1) library size
+	2) per base coverages of the sample as a dictionary with key = chromosome, value = vector of doubles --> NO, this is unnecessary, the ER border will never be within a bin anyway since a bin has uniform counts...
+
+3. normalize sample_per_base coverages BEFORE adding to all_per_base_coverages
+
+
+# Questions:
+- do I need sample_id information for all_bedgraphs? why iterate over samples in integrate_sj.cpp?? why do i need to organize the MM matrix by sample id?
+	- get mean coverage vector across all samples with compute_avg_coverage(all_bedgraphs) -> assuming that the samples are already grouped meaningfully (e.g. by age, sex, disease, tissue etc.)
+	- with find_ERs(b), the cutoff of 0.25 is applied to the mean expression vector to keep only the expressed regions (ERs) -> this is done to the mean coverage vector
+	- then iterate over each sample and find the stitched_regions (i.e. full genes rather than exons) for this sample
+
+=> I need to extract the MM entries for all samples that are used!
+=>
+
+
+# integration of rail_id
+
+- parse https://duffel.rail.bio/recount3/mouse/data_sources/sra/junctions/73/SRP150473/sra.junctions.SRP150473.ALL.ID.gz file to map rail_id to id used in MM file 
+	rail_id is ordered by size, so smallest rail_id corresponds to MM id 1
+	16802 <--> 1
+	20089887 <--> 2932 
+
+- find mapping from rail_id to external_id (which is also the file name!) --> rail_id is unique across the whole recount3 dataset
+- add sample_id to the BedGraphRow object
+
+# TODOS from 15.10
+- work on line 145 of Parser.cpp to implement the cumulative sum of sj_id -> count
+- check it
+- then continue with normalize question and confirm again that per_base_pair_coverage is not needed!
