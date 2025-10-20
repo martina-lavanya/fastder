@@ -43,22 +43,29 @@ read_mm takes about 2-3 min to run!
 3. normalize sample_per_base coverages BEFORE adding to all_per_base_coverages
 
 
+
 # Questions:
 - do I need sample_id information for all_bedgraphs? why iterate over samples in integrate_sj.cpp?? why do i need to organize the MM matrix by sample id?
 	- get mean coverage vector across all samples with compute_avg_coverage(all_bedgraphs) -> assuming that the samples are already grouped meaningfully (e.g. by age, sex, disease, tissue etc.)
-	- with find_ERs(b), the cutoff of 0.25 is applied to the mean expression vector to keep only the expressed regions (ERs) -> this is done to the mean coverage vector
-	- then iterate over each sample and find the stitched_regions (i.e. full genes rather than exons) for this sample
+	- with find_ERs(), the cutoff of 0.25 is applied to the mean expression vector to keep only the expressed regions (ERs) -> this is done to the mean coverage vector
+	=> I need to extract the MM entries for all samples that are used!
 
-=> I need to extract the MM entries for all samples that are used!
-=>
+	# update 20.10: 
+	- then iterate over each sample and find the stitched_regions (i.e. full genes rather than exons) for this sample -> why exactly over each samples if I'm working with the mean expression vector anyway? I think I just need to iterate over the
+		1) expressed regions
+		2) splice junctions
+	simultaneously and see if they line up in terms of counts and bp positions
+	- sample imformation is already lost when I compute the mean coverage vector! 
+
+
 
 
 # integration of rail_id
 
 - parse https://duffel.rail.bio/recount3/mouse/data_sources/sra/junctions/73/SRP150473/sra.junctions.SRP150473.ALL.ID.gz file to map rail_id to id used in MM file 
 	rail_id is ordered by size, so smallest rail_id corresponds to MM id 1
-	16802 <--> 1
-	20089887 <--> 2932 
+	16802 <--> 0
+	20089887 <--> 2931
 
 - find mapping from rail_id to external_id (which is also the file name!) --> rail_id is unique across the whole recount3 dataset
 - add sample_id to the BedGraphRow object
@@ -67,3 +74,18 @@ read_mm takes about 2-3 min to run!
 - work on line 145 of Parser.cpp to implement the cumulative sum of sj_id -> count
 - check it
 - then continue with normalize question and confirm again that per_base_pair_coverage is not needed!
+
+# Notes 20.10
+
+- I have two mm objcts:
+	1. rail_id_to_mm_id (which stores the mapping of e.g. rail_id 169404 to mm_id 2931) 
+	2. all_mm_sj_counts (which stores the cumulative count of each splice junction across all samples that are 
+	PRESENT in the dataset)
+	--> should it be a map or an unordered map?
+		-> need fast lookups of all_mm_sj_counts[sj_id] += count
+		->
+
+- for the exon stitching using the splice junctions, I want to iterate over the sj_ids in sequence of their mm_ids (since a smaller mm_id corresponds to a smaller chromosomal position)
+	-> luckily smaller mm_ids correspond to smaller rail_ids
+
+
