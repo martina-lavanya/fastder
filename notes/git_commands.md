@@ -20,7 +20,7 @@ set to SSH
 2. ssh -T git@github.com
 
 diverging branches:
-git pull --rebase origin initial-cpp-algorithm
+git pull --rebase origin cpp_development
 
 remove folder from remote
 1. add to .gitignore
@@ -46,3 +46,18 @@ grep:
 1. for a file name: find . -type f -name "filename.txt" (or find /etc/hosts -type f -name "hi.txt")
 2. for a directory: find . -type d -name "dirname"
 3. for a string: grep -ri "search"
+
+
+commands to build:
+1) install cmake, check with cmake --version
+2) mkdir build
+cd build
+3) cmake .. (if the cmake file is one level out of the build directory)
+4) make -j$(nproc) (build with multiple cores)
+5) ./mls
+
+
+rm -rf build
+mkdir build && cd build
+cmake ..
+make -j$(nproc)

@@ -3,17 +3,13 @@
 # member variables
 
 std::string path;
-std::unordered_map<std::string, std::vector<BedGraphRow>> all_bedgraphs; //key = sample id, value = bedgraph of the sample
-//std::vector<std::unordered_map<std::string, std::vector<double>>> all_per_base_coverages;
+std::vector<std::vector<BedGraphRow>> all_bedgraphs; //TODO maybe change to unordered map with key = sample id, value = bedgraph of the sample?
 
-
-// store RR file for one sample
+// store RR info for each splice junctions
 std::vector<SJRow> rr_all_sj;
 
-// store Market Matrix (MM) file for one sample
-// std::unordered_map<unsigned int, std::vector<std::pair<unsigned int, unsigned int>>> mm_by_samples;
-
-std::unordered_map<unsigned int, unsigned int> mm_sj_counts; // <sj_id, count> map for all samples in the user input
+//TODO use uint64_t instead for the sj_id
+std::unordered_map<unsigned int, unsigned int> mm_sj_counts; // <sj_id, count> map of sj occurring in samples part of the user input
 
 std::vector<std::pair<unsigned int, std::string>> rail_id_to_ext_id; // <rail_id, external_id> for all samples in the dataset
 
