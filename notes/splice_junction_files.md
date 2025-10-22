@@ -117,3 +117,16 @@ let's say binary search:
 
 
 					COMET C++-oriented
+
+
+
+can input different gffs to the gffcompare tool
+
+	build some sort of tree of cell
+
+	build metric of how similar two gtfs are -> if they are more similar, then they have similar gene expression
+
+
+	up to 64 cores for parallelization
+
+	parallelize the different chromosomes but remember that other organisms have more chromosomes!
