@@ -22,6 +22,8 @@ set to SSH
 diverging branches:
 git pull --rebase origin cpp_development
 
+git merge origin/cpp_development (to keep both remote and local changes. will run without further inputs if there are no changes in the same file)
+
 remove folder from remote
 1. add to .gitignore
 2. git rm -r --cached <folder> (don't forget --cached, otherwise local deletion as well!)
