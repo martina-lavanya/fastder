@@ -45,3 +45,19 @@ std::vector<std::pair<unsigned int, unsigned int>> rail_id_to_mm_id; // <rail_id
 - check if unsigned long long is needed anywhere else
 
 # IMPORTANT TODO: should all_per_base_coverage be computed in Parser class anyway? yes, it saves an iteration...
+
+
+Stitched ER member variables:
+
+
+    std::vector<unsigned int> er_ids; //all expressed regions in a stitched_ER, er_id corresponds to index of averager.expressed_regions
+    // example: stitched_ER consists of er_ids 45, 46, 47, 49 == vector indices of expressed_regions
+    double across_er_coverage; // avg (weighted) coverage of all exons that are part of the stitched ER so far
+    std::vector<std::pair<unsigned int, double>> all_coverages; // stores a pair of er length (= weight) + normalized average coverage of the er
+    unsigned int total_length;
+    uint64_t start;
+    uint64_t end;
+    std::string chrom; 
+
+
+    
