@@ -1,14 +1,37 @@
 //
-// Created by martinalavanya on 24.09.25.
+// Created by marti on 08/10/2025.
 //
+#pragma once
 
-#ifndef MLS_BEDGRAPHROW_H
-#define MLS_BEDGRAPHROW_H
+#ifndef FASTDER_BEDGRAPHROW_H
+#define FASTDER_BEDGRAPHROW_H
 
+#include <string>
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <sstream>
+#include <BedGraphRow.h>
+#include <cstdint>
+
+#endif //FASTDER_BEDGRAPHROW_H
 
 class BedGraphRow
 {
+public:
+    std::string chrom;
+    uint64_t start;
+    uint64_t end;
+    double coverage; // normalized coverage by CPM
+    unsigned int total_reads; // number of reads spanning across the bin, total_reads = length * coverage
+    unsigned int length;
+    // add optional values for average coverage, DER identifier
+
+
+    BedGraphRow() = default;
+    BedGraphRow(std::string chrom, uint64_t start, uint64_t end, double coverage);
+    void print() const;
+    void normalize(const uint64_t library_size);
+
 };
-
-
-#endif //MLS_BEDGRAPHROW_H

@@ -1,0 +1,183 @@
+//
+// Created by martinalavanya on 20.10.25.
+//
+
+#include <cassert>
+#include <Integrator.h>
+
+// constructor
+Integrator::Integrator()
+{
+    stitched_ERs = {}; // empty vector with elements of type StitchedER
+}
+
+
+
+// function that calculates relative match with a tolerance of +/- n%
+bool Integrator::within_threshold(double val1, double val2){
+    double tolerance_bottom = val1 * (1 - coverage_tolerance);
+    double tolerance_top = val1 * (1 + coverage_tolerance);
+    return val2 >= tolerance_bottom && val2 <= tolerance_top;
+}
+
+bool Integrator::within_threshold(uint64_t pos_1, uint64_t pos_2){
+    //example: pos_1 = 15 (end position of exon), pos_2 = 18 (start position of SJ)
+    // 15 >= 18 - 10 and 15 <= 18 + 10
+    return pos_1 >= pos_2 - position_tolerance && pos_1 <= pos_2 + position_tolerance;
+}
+
+// function that calculates relative match with a tolerance of +/- 5%
+bool Integrator::is_similar(const StitchedER& most_recent_er, const BedGraphRow& expressed_region, const SJRow& current_sj){
+
+    return (within_threshold(most_recent_er.end, current_sj.start)
+       && within_threshold(expressed_region.start, current_sj.end)
+       && within_threshold(most_recent_er.across_er_coverage, expressed_region.coverage)); //TODO maybe compare with across_er_coverage instead
+}
+
+// function that calculates relative match with a tolerance of +/- 5%
+bool Integrator::sj_too_far_back(const uint64_t most_recent_er_end, const uint64_t sj_start){
+
+    return most_recent_er_end > sj_start
+    && !within_threshold(most_recent_er_end, sj_start);
+}
+
+void Integrator::stitch_up(std::unordered_map<std::string, std::vector<BedGraphRow>>& expressed_regions, const std::map<std::string, std::vector<uint64_t>>& mm_chrom_sj, const std::vector<SJRow>& rr_all_sj)
+{
+    // iterate over chromosomes and sj_ids -> sjs.first = chrom, sjs.second = vector<sj_id>
+    for (auto& sjs : mm_chrom_sj)
+    {
+        std::string chrom = sjs.first;
+        StitchedER er1 = StitchedER(expressed_regions.at(chrom).at(0), 0); // define the first StitchedER, currently consisting of 1 ER
+        stitched_ERs.push_back(er1);
+        bool first_er = true;
+        auto current_sj = sjs.second.begin(); // iterator over the vector of sj_id
+        std::cout << stitched_ERs.front() << std::endl;
+        int max_stitched_ers = 0;
+        // iterate over expressed regions
+        for (unsigned int i = 0; i < expressed_regions.at(chrom).size(); ++i)
+        {
+            // TODO what about the last SJ, make sure to use it too
+            //only compare if we aren't at the last SJ yet
+            if (current_sj != sjs.second.end()){
+
+                const auto& expressed_region = expressed_regions[chrom][i];
+                StitchedER& most_recent_er = stitched_ERs.back(); // this is one expressed region right now
+
+                // skip to SJ with coordinates that line up with the most recent ER
+                std::cout << "upstream ER: " << expressed_regions[chrom][most_recent_er.er_ids.back()].chrom << ", (pos) " << expressed_regions[chrom][most_recent_er.er_ids.back()].start << "\t" << expressed_regions[chrom][most_recent_er.er_ids.back()].end << ", (len) " << expressed_regions[chrom][most_recent_er.er_ids.back()].end -  expressed_regions[chrom][most_recent_er.er_ids.back()].start <<std::endl;
+                std::cout << "downstream ER: " << expressed_region.chrom << ", (pos) " << expressed_region.start << "\t" << expressed_region.end << ", (len) " <<  expressed_region.end  - expressed_region.start << std::endl;
+                while (current_sj != sjs.second.end() && within_threshold(most_recent_er.end, rr_all_sj[*current_sj].start) && rr_all_sj[*current_sj].chrom == chrom)
+                {
+                    std::cout << "current SJ = " << rr_all_sj[*current_sj].start << " <--> " <<  rr_all_sj[*current_sj].end << std::endl;
+                    ++current_sj;
+                }
+                std::cout << "current SJ = " << rr_all_sj[*current_sj].start << " <--> " <<  rr_all_sj[*current_sj].end << std::endl;
+                // get rr_all_sj, which is a vector of SJRows
+                if (is_similar(most_recent_er, expressed_region, rr_all_sj[*current_sj]))
+                {
+                    //
+                    // std::cout << "upstream ER: " << "(chr) " << expressed_regions[chrom][most_recent_er.er_ids.back()].chrom << ", (pos) " << expressed_regions[chrom][most_recent_er.er_ids.back()].start << "\t" << expressed_regions[chrom][most_recent_er.er_ids.back()].end << std::endl;
+                    // std::cout << "current SJ: " << "(chr) " << rr_all_sj[*current_sj].chrom  << ", (pos) " << rr_all_sj[*current_sj].start << "\t" << rr_all_sj[*current_sj].end << std::endl;
+                    // std::cout << "downstream ER: " << "(chr) " << expressed_region.chrom << ", (pos) " << expressed_region.start << "\t" << expressed_region.end << std::endl;
+                    std::cout << expressed_regions[chrom][most_recent_er.er_ids.back()].end << " <--> " << rr_all_sj[*current_sj].start << ", " << rr_all_sj[*current_sj].end<< " <--> " <<  expressed_region.start << std::endl;
+
+                    //expressed_region.print();
+                    // the chromosome that
+                    assert(rr_all_sj[*current_sj].chrom == expressed_region.chrom && expressed_region.chrom == expressed_regions[chrom][most_recent_er.er_ids.back()].chrom);
+                    most_recent_er.append(i, expressed_region.length, expressed_region.coverage);
+
+                    // std::cout << "STITCHED region: current er_id = " << i << std::endl;
+                    // std::cout << stitched_ERs.back() << std::endl;
+                    // move to next SJ
+                    ++current_sj;
+
+                    // find maximum number of ERs that were stitched together
+                    if (max_stitched_ers < stitched_ERs.back().er_ids.size())
+                    {
+                        max_stitched_ers = stitched_ERs.back().er_ids.size();
+                    }
+                }
+
+                // current ER doesn't belong to any existing ERs --> start a new ER
+                else
+                {
+                    if (first_er)
+                    {
+                        stitched_ERs.back() = StitchedER(expressed_region, i); // replace dummy first element with real first element
+                        first_er = false;
+                        //assert(stitched_ERs.size() == 1);
+                    }
+                    else
+                    {
+                        stitched_ERs.push_back(StitchedER(expressed_region, i));
+                    }
+
+                }
+
+
+            }
+        }
+        std::cout << "max_stitched_ers = " << max_stitched_ers<< std::endl;
+    }
+}
+
+
+void Integrator::write_to_gtf(const std::string& output_path)
+{
+    std::ofstream out(output_path);
+    if (!out.is_open()) {
+        std::cerr << "Error: could not open output file " << output_path << std::endl;
+        return;
+    }
+    // get today's date
+    auto now = std::chrono::system_clock::now();
+    std::chrono::year_month_day ymd{std::chrono::floor<std::chrono::days>(now)};
+    //format as YYYY-MM-DD
+    std::string date = std::format("{:%Y-%m-%d}", ymd);
+
+    // write headers
+    out << "##description: expressed region annotation of genome based on bigwig and MM / RR splice junction information." << std::endl;
+    out << "##provider: FASTDER" << std::endl;
+    out << "##contact: marlehmann@ethz.ch" << std::endl;
+    out << "##format: gtf" << std::endl;
+    out << "##date: " << date << std::endl;
+
+    for (unsigned int i = 0; i < this->stitched_ERs.size(); ++i)
+    {
+        // each stitched_er is both a gene and a transcript
+        GTFRow gtf_row = GTFRow(stitched_ERs[i], "gene", i + 1);
+        out << gtf_row << std::endl;
+
+        gtf_row.change_feature("transcript", i + 1, 0);
+        out << gtf_row << std::endl;
+        // std::cout << "gtf coords: " << gtf_row.start << " " << gtf_row.end << std::endl;
+        // std::cout << "stitched er coords: " << stitched_ERs[i].start << " " << stitched_ERs[i].end << std::endl;
+
+        // add the ERs within the stitched_er
+        for (unsigned int k = 0; k < stitched_ERs[i].er_ids.size(); ++k)
+        {
+
+            gtf_row.change_feature("exon", i + 1, k + 1);
+           // std::cout  << "start= " << gtf_row.start << ", length = " << stitched_ERs.at(i).all_coverages.at(k).first << std::endl;
+            gtf_row.end = gtf_row.start + stitched_ERs.at(i).all_coverages.at(k).first; // start + length = end
+
+            out << gtf_row << std::endl;
+            gtf_row.start = gtf_row.end;
+
+        }
+
+        if (gtf_row.end != stitched_ERs[i].end)
+        {
+            std::cerr << "ERROR: ends don't match: gtf_row end = " << gtf_row.end << " and stitched_ER end = " << stitched_ERs[i].end << std::endl;
+            std::cerr << "gtf start = " << gtf_row.start << std::endl;
+
+        }
+        assert(gtf_row.end == stitched_ERs[i].end);
+        // if (gtf_row.end != stitched_ERs[i].end)
+        // {
+        //     std::cerr << "ERROR: ends don't match: gtf_row end = " << gtf_row.end << " and stitched_ER end = " << stitched_ERs[i].end << std::endl;
+        //     std::cerr << "gtf start = " << gtf_row.start << std::endl;
+        // }
+    }
+    out.close();
+}

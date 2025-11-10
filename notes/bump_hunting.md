@@ -6,6 +6,7 @@ Algorithm:
 2. compute per-base-pair average across all samples (adjusted by library size) --> gives a vector of mean expression across the genome
 3. average-cutoff is applied to mean expression (i.e. mean base coverage) -> an expressed region is a contiguous set of bases that has a gene expression above the mean expression cutoff, where the mean expression is calculated over all samples using an F-statistic model
 4. count number of reads that overlap with an expressed region --> in the paper, they use "bumphunter" from another paper --> The DERs can be annotated to their nearest gene or known feature using bumphunter 
+5. annotation: Ensembl database v75 --> check for each expressed region that is longer than 9 bp if it maps to an intronic, exonic or unknown region
 
 F-statistic model:
 - fit an intercept-only null model (just the mean expression? or what is the intercept?) and an alternative model which accounts for tissue differences with different coefficients
@@ -67,7 +68,7 @@ iterate over the entire chromosome (for each bp, we have a "value")
 	- decide on a cutoff (which is compared with the mean coverage across samples, as calculated above)
 
 
-# Algorithm
+# Algorithm Brainstorming
 	- remove bases with very low coverage right away by applying a cutoff value to the mean coverage vector (across samples)
 	- idea: iterate over the entire genome (perhaps still in .bed compressed version, so not a separate row for each nt but one entry for each window with the same length)
 		1. check if the value for this window is close to the current bump (find an acceptable range)
@@ -86,13 +87,44 @@ Ideas:
 	note that depending on the site, the cutoff can be more or less clean cut
 		not-so-clean: https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr1%3A160037400%2D160037600&hgsid=3165714530_UK0JAgDpH119ju1HV7IOFvAtcbIn
 		super-clean: https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr1%3A160042400%2D160043000&hgsid=3165714530_UK0JAgDpH119ju1HV7IOFvAtcbIn
-2. 
-
-
 
 megadepth: computing coverage for genomic regions from the recount3 bigWig
 files 
 
+
+# Metadata
+- Variable list from GTEx: https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/GetListOfAllObjects.cgi?study_id=phs000424.v5.p1&object_type=variable
+- select for
+	AGE
+	SEX
+  group with expected differential expression: SMTSD
+  https://www.nature.com/articles/s41598-017-00952-9 cerebellum has the most differential expression in the brain
+  --> select cerebellum vs cortex as the groups
+
+# Current Algorithm
+1. read in files
+2. create per-bp-coverage files whilst also counting all reads, **normalize** by read count
+3. create per-bp average coverage file
+4. iterate over each bedgraph and identify differentially expressed regions (stored in bedgraph or in per-bp)?
+   1. remove all positions with < 5 reads
+   2. group regions as differentially expressed by computing moving average for a region and adding to the region if
+   the new bp has +/- 10% of the moving average coverage (e.g. moving average is 50, if bp 277 has coverage 55, 
+   we add it to the differentially expressed region)
+   3. store in new vector (or the same as per-bp)?
+   0: not differentially expressed
+   -1: too few reads
+   1...n: part of differentially expressed region x
+   4. create vector which stores only the differentially expressed regions and their positions and th
+   chrom------start--------end---------coverage (avg)---------coverage (actual)----------difference
+
+idea: have data structure with string (chr) and vector (bp coverage) for when i work with multiple chromosomes as well
+
+
+# further ideas for algorithm
+- smoothening: https://pmc.ncbi.nlm.nih.gov/articles/PMC3304533/
+
+# C++ Dataframe Libraries
+https://github.com/hosseinmoein/DataFrame
 
 ## data formatting of recount3:
 The coverage summaries provided in recount3 are stored as tab delimited matrices in
