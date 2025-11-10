@@ -3,3 +3,6 @@ kentutils/
 DataFrame/
 utilities/
 organisational/
+build/
+.idea/
+_codeql_build_dir/

@@ -10,6 +10,9 @@ FetchContent_MakeAvailable(googletest)
 add_executable(mls-tests
         test_stitch_up.cpp
         splicing_scenarios.cpp
+        test_sjrow.cpp
+        test_bedgraphrow.cpp
+        test_integration.cpp
 )
 
 target_link_libraries(mls-tests
