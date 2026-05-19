@@ -4,10 +4,32 @@
 It is intended to build on the `recount3` [resource](https://rna.recount.bio/), which consists of over 750'000 uniformly processed RNA-seq samples across different mouse and human studies.
 The tool aims to reconstruct expressed genes prior to splicing in an annotation-agnostic approach.
 
-`fastder` takes genome-wide coverage bigWig files and splice junction coordinates as an input. The tool averages across samples and performs thresholding to identify 
-consecutive regions with above-threshold expression. Following this, `fastder` attempts to stitch together expressed regions (ERs)
-by searching for splice junction coordinates that overlap with the start and end position of these expressed regions. 
+`fastder` takes genome-wide coverage files and splice junction coordinates as input. Coverage can be supplied as BedGraph by default, or as BigWig when the build was configured with `-DFASTDER_USE_LIBBIGWIG=ON`. The tool averages across samples and applies a coverage threshold to identify consecutive regions with above-threshold expression. It then stitches expressed regions (ERs) together when a splice junction in the input matches the end of one ER and the start of the next.
 
+Coverage is held in memory as a sparse list of intervals rather than a dense per-base vector. On chr21 this keeps the resident set in the low hundreds of MB instead of multiple GB at full hg38. Splice junctions are partitioned by strand at the Integrator: each chromosome's expressed regions are walked once per strand, and chains built from junction-linked ERs are tagged `+` or `-`. Standalone ERs that no junction connected to a neighbour stay unstranded (`.`).
+
+
+## Building
+
+The default build needs cmake (4.0 or newer) and a C++20 compiler:
+
+```
+mkdir build
+cd build
+cmake ..
+make -j
+```
+
+To read BigWig coverage directly instead of converting to BedGraph first,
+configure with `-DFASTDER_USE_LIBBIGWIG=ON`. CMake will fetch libBigWig from
+GitHub at configure time. zlib and libcurl headers must be available.
+
+```
+cmake -DFASTDER_USE_LIBBIGWIG=ON ..
+```
+
+The unit tests run with `ctest` from the build directory. Two tests are gated
+on the libBigWig option and are skipped in the default build.
 
 ## Installation
 
@@ -69,8 +91,7 @@ that the tool will only output expressed regions on chromosome 1, and will ignor
   - `--min-length 5` describes the minimum length (in bp) that an ER must have. For instance, three consecutive base pairs with coverage > 0.25 CPM will be ignored if the min length is set to 5 bp.
   - `--position-tolerance 5` describes the maximum permitted offset of the end position of an exon and the starting position of a splice junction. If this tolerance is set to 5,
   an ER with end position = 1000 bp and a splice junction with start position = 1005 bp will be stitched together (if the coverage and end junction match).
-  - `--coverage-tolerance 0.1` describes the maximum permitted coverage deviation between two ER that are separated by a spliced region. For a coverage tolerance of 0.1, 
-  two ERs with coverage = 10 CPM and 11 CPM will be stitched together (if there is a matching splice junction).
+  - `--coverage-tolerance 1000` describes the permitted coverage deviation between two ERs separated by a spliced region. It defaults to 1000, effectively off, so stitching is driven by splice junctions rather than coverage similarity.
 
 A visualization of the different parameters is provided below.
 
@@ -81,13 +102,14 @@ Usage:
       --dir <path> ... \
       [--chr <chr1> <chr2> ...] \
       [--min-coverage <float>] \
+      [--min-length <int>] \
       [--position-tolerance <int>] \
       [--coverage-tolerance <float>] \
-      [--help]
+      [--cores <int>]
 
 Required inputs:
 
-   --dir <path> ...                             Relative path from the build directory to the directory containing the input files.
+   --dir <path> ...                             Relative path from the build directory, or an absolute path, to the directory containing the input files.
                                                 Example: --dir ../../data/test_exon_skipping
 
 Optional inputs:
@@ -96,24 +118,26 @@ Optional inputs:
                                                 Default: all (chr1-chr22, chrX)
                                                 Example: --chr chr1 chr2 chr3
                                                 
-   --min-length <float>                         Minimum length [#bp] required for a region to qualify as an expressed region (ER).
-                                                Default: 5 bp
-                                                Example: --min-length 5
+   --min-length <int>                           Minimum length [#bp] required for a region to qualify as an expressed region (ER).
+                                                Default: 10 bp
+                                                Example: --min-length 10
                                                 
    --min-coverage <float>                       Minimum coverage [CPM] required for a region to qualify as an ER.
                                                 Normalized in-place by library size.
-                                                Default: 0.25 CPM
+                                                Default: 0.05 CPM
                                                 Example: --min-coverage 0.25
    
    --position-tolerance <int>                   Maximum allowed positional deviation between splice junction and ER coordinates [bp].
                                                 Default: 5 bp
                                                 Example: --position-tolerance 5
    
-   --coverage-tolerance <float>                 Allowed relative deviation in coverage between stitched ERs (e.g. 0.1 = 10%).
-                                                Default: 0.1
-                                                Example: --coverage-tolerance 0.1
+   --coverage-tolerance <float>                 Permitted coverage deviation between stitched ERs, as a proportion of the running average.
+                                                Default: 1000 (gate effectively off; stitching is junction-driven).
+                                                Example: --coverage-tolerance 2.0
    
-   --help                                       Show this help message.
+   --cores <int>                                Number of cores fastder may use.
+                                                Default: 10
+                                                Example: --cores 23
    
 
 Example:
@@ -122,9 +146,9 @@ Example:
    --dir ../../data/input \
    --chr chr1 chr2 \
    --position-tolerance 5 \
-   --min-length 5 \
-   --min-coverage 0.25 \
-   --coverage-tolerance 0.1
+   --min-length 10 \
+   --min-coverage 0.05 \
+   --cores 10
 ```
 
 
